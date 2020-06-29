@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "19794283074",
+    "firebase_url": "https://chatapp-ec44f.firebaseio.com",
+    "project_id": "chatapp-ec44f",
+    "storage_bucket": "chatapp-ec44f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19794283074:android:b5c230c1eda97ebc3dbbdb",
+        "android_client_info": {
+          "package_name": "com.creapple.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "19794283074-vphgumd8mbhi883ags643iagcvgor3su.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv0tyRhnmT8gQyKR-HCGcLy-_QZ03bRig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "19794283074-vphgumd8mbhi883ags643iagcvgor3su.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
