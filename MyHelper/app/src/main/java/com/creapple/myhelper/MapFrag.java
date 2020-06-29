@@ -1,7 +1,7 @@
 package com.creapple.myhelper;
 
 import android.Manifest;
-
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.creapple.myhelper.data.Document;
@@ -35,7 +34,6 @@ import com.creapple.myhelper.data.MaskstockService;
 import com.creapple.myhelper.data.Result;
 import com.creapple.myhelper.data.Store;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.daum.mf.map.api.CalloutBalloonAdapter;
@@ -52,11 +50,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapFrag extends Fragment implements MapView.CurrentLocationEventListener,MapView.POIItemEventListener {
+public class MapFrag extends Fragment implements MapView.CurrentLocationEventListener, MapView.POIItemEventListener, LocationListener {
     public MapView mapView;
+    Location location;
     public double longitude1;
     public double latitude1;
-    EditText editlocation;
+
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    protected LocationManager locationManager;
+
     Retrofit retrofit;
     Retrofit retrofit2;
     List<Store> stores;
@@ -67,26 +70,26 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
     TextView address;
     public double dest_lat;
     public double dest_long;
+    GpsTracker gpsTracker;
+
 
     final String BASE_URL = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/";
     MaskstockService maskstockService;
 
 
-    @Nullable
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.map_view, container, false);
         final EditText editlocation = (EditText) rootView.findViewById(R.id.edit_location);
         Button search = (Button) rootView.findViewById(R.id.search);
 
-        RelativeLayout bottomSheet =(RelativeLayout) rootView.findViewById(R.id.rl_bottom_sheet) ; //부모를 바로 Coordinatorlayout으로 해야함 layput으로 했다가 개고샡함
-         name =(TextView) rootView.findViewById(R.id.storename);
-        address =(TextView) rootView.findViewById(R.id.address);
-        stock =(TextView) rootView.findViewById(R.id.stock);
-        Button navi =(Button) rootView.findViewById(R.id.gonavi);
+        RelativeLayout bottomSheet = (RelativeLayout) rootView.findViewById(R.id.rl_bottom_sheet); //부모를 바로 Coordinatorlayout으로 해야함 layput으로 했다가 개고샡함
+        name = (TextView) rootView.findViewById(R.id.storename);
+        address = (TextView) rootView.findViewById(R.id.address);
+        stock = (TextView) rootView.findViewById(R.id.stock);
+        Button navi = (Button) rootView.findViewById(R.id.gonavi);
 
-         bottomSheetBehavior =BottomSheetBehavior.from(bottomSheet);
-         bottomSheetBehavior.setState(bottomSheetBehavior.STATE_HIDDEN); //숨김상태
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setState(bottomSheetBehavior.STATE_HIDDEN); //숨김상태
 
         FloatingActionButton refresh = (FloatingActionButton) rootView.findViewById(R.id.floatingRenew); //floating button 설정 ==>xml에서 다르게 해야함 예제랑
 
@@ -95,26 +98,13 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editlocation.getWindowToken(), 0);
 
+        getLocation();
+
         ViewGroup mapViewContainer = (ViewGroup) rootView.findViewById(R.id.map);
-
-
-        //현재 좌표값 입력 받기
-        LocationManager ln = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE); //fragment에서 는 가지고 있찌 않은 메소드 이기에 getTactivity를 해줘야한다.
-
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        } else {
-            Location location = ln.getLastKnownLocation(LocationManager.GPS_PROVIDER);//기징 최근 정보를 가지고 오기
-            if (location != null) {
-                String provider = location.getProvider();
-                longitude1 = location.getLongitude();
-                latitude1 = location.getLatitude();
-
-                ln.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, gpsLocationListner);
-            }
-
-        }
+        final double latitude1 = getLatitude();
+        final double longitude1 = getLongitude(); //경도
+        Log.e("위도 경도 찐이야!!!!!!!", "" + latitude1 + longitude1);
+        requestData(latitude1, longitude1);
 
         mapView.setCurrentLocationEventListener(this);
         mapView.setDaumMapApiKey(" eb7e640b74c2adee8272ec7d6a35b966");
@@ -122,7 +112,7 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         mapView.setPOIItemEventListener(this);
         mapView.zoomIn(true);
         mapView.zoomOut(true);
-        requestData(latitude1, longitude1);
+
         mapViewContainer.addView(mapView);
 
 
@@ -135,16 +125,16 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
             }
         });
 
-         navi.setOnClickListener(new View.OnClickListener() {
+        navi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String current;
-                String wantogo=editlocation.getText().toString();
-                if(wantogo ==null){
+                String wantogo = editlocation.getText().toString();
+                if (wantogo == null) {
                     Toast.makeText(getActivity(), "도착지를 입력하세요", Toast.LENGTH_SHORT).show();
-                }else{
-                    Intent webmap =new Intent(Intent.ACTION_VIEW);
-                    webmap.setData(Uri.parse("daummaps://route?sp="+latitude1+","+longitude1+"&ep="+dest_lat+","+dest_long+"&by=CAR"));
+                } else {
+                    Intent webmap = new Intent(Intent.ACTION_VIEW);
+                    webmap.setData(Uri.parse("daummaps://route?sp=" + latitude1 + "," + longitude1 + "&ep=" + dest_lat + "," + dest_long + "&by=CAR"));
                     getActivity().startActivity(webmap);
                 }
 
@@ -154,12 +144,12 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                switch (i){
+                switch (i) {
                     //case  bottomSheetBehavior.STATE_COLLAPSED:
 
                 }
 
-           }
+            }
 
             @Override
             public void onSlide(@NonNull View view, float v) {
@@ -168,18 +158,93 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         });
 
 
-
         mapView.setCalloutBalloonAdapter(new CustomCalloutBalloonAdapter());
 
 
         return rootView;
     }
 
+
+    //현재 위치 받는메소드
+    public Location getLocation() {
+        try {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if (!isGPSEnabled && !isNetworkEnabled) {
+            } else {
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION);
+                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                } else return null;
+                if (isNetworkEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (location != null) {
+                            latitude1 = location.getLatitude();
+                            longitude1 = location.getLongitude();
+                        }
+                    }
+                }
+                if (isGPSEnabled) {
+                    if (location == null) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            if (location != null) {
+                                latitude1 = location.getLatitude();
+                                longitude1 = location.getLongitude();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.d("@@@", "" + e.toString());
+        }
+        return location;
+    }
+
+    public double getLatitude() {
+        if (location != null) {
+            latitude1 = location.getLatitude();
+        }
+        return latitude1;
+    }
+
+    public double getLongitude() {
+        if (location != null) {
+            longitude1 = location.getLongitude();
+        }
+        return longitude1;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude1 = getLatitude();
+        longitude1 = getLongitude();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+
     //floating button onClicklistener
     class refreshclickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude1, longitude1), true);
+            requestData(latitude1, longitude1);
 
         }
     }
@@ -200,7 +265,7 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
                     } else {
                         double x = Double.parseDouble(documents.get(0).getX());
                         double y = Double.parseDouble(documents.get(0).getY());
-                        Log.d("위도 경로", "위도 , 경도:" + x + "," + y);
+                        Log.d("위도 경로!!!!!!!", "위도 , 경도:" + x + "," + y);
 
                         requestData(y, x);
                     }
@@ -226,7 +291,7 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         retrofit = new Retrofit.Builder().baseUrl(BASE_URL).
                 addConverterFactory(GsonConverterFactory.create())
                 .build();
-
+        Log.d("위도!!!!!!!!!!!!!!!!!", "    경도 " + lat + lng);
         maskstockService = retrofit.create(MaskstockService.class);
         //서비스와 연결
         maskstockService.getResult(lat, lng, 750).enqueue(new Callback<Result>() {
@@ -236,7 +301,7 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
                     Log.d("통신!!!!!!!!!!!!! :", "통신성공");
 
                     stores = response.body().getStores();
-                    Log.d("data :", "store 갯수 : " + response.message());
+                    Log.d("data :", "store 갯수 : ");
 
 
                     customView(lat, lng);
@@ -281,10 +346,10 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
     // Callout Balloon(말풍선)이 아이콘(마커)위에 나타난다.
     @Override
     public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
-        Store store=stores.get(mapPOIItem.getTag());
-        Log.d("터치한!!!!!!!!!!1",store.getName());
-        Log.d("터치한!!!!!!!!!!1",store.getAddr());
-        Log.d("터치한!!!!!!!!!!1","경도"+store.getLat());
+        Store store = stores.get(mapPOIItem.getTag());
+        Log.d("터치한!!!!!!!!!!1", store.getName());
+        Log.d("터치한!!!!!!!!!!1", store.getAddr());
+        Log.d("터치한!!!!!!!!!!1", "경도" + store.getLat());
 
         bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED); //높이만큼 노출
         name.setText(store.getName());
@@ -304,7 +369,6 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
                 stock.setTextColor(Color.parseColor("#FFD700"));
 
 
-
             } else if (store.getRemainStat().equals("few")) {
                 stock.setText("30개~2개");
                 stock.setTextColor(Color.parseColor("#FF4500"));
@@ -319,13 +383,8 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
         }
 
 
-        dest_lat=store.getLat();
-        dest_long=store.getLng();
-
-
-
-
-
+        dest_lat = store.getLat();
+        dest_long = store.getLng();
 
 
     }
@@ -349,7 +408,6 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
     public void customView(double lat, double lng) {
 
 
-        //Log.d("정","정"+stores.get(0).getLat()+stores.get(0).getLng()) ;
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(lat, lng), true);
 
 
@@ -414,7 +472,6 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
             //stores.put(marker.getTag(),)
 
 
-
         }
 
 
@@ -458,30 +515,6 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
 
         @Override
         public View getCalloutBalloon(MapPOIItem poiItem) {
-            /*  Store store=stores.get(poiItem.getTag());
-
-            //완전 바보 같은 실수였음....내가.... cutomview를 math_parrent로 설정해서
-            if (store.getRemainStat() != null) {
-                if (store.getRemainStat().equals("empty")) {
-                    ((TextView) mCalloutBalloon.findViewById(R.id.remain_state)).setText("품절");
-
-                } else if (store.getRemainStat().equals("plenty")) {
-                    ((TextView) mCalloutBalloon.findViewById(R.id.remain_state)).setText("충분");
-
-                } else if (store.getRemainStat().equals("some")) {
-                    ((TextView) mCalloutBalloon.findViewById(R.id.remain_state)).setText("보통");
-
-                } else if (store.getRemainStat().equals("few")) {
-                    ((TextView) mCalloutBalloon.findViewById(R.id.remain_state)).setText("소량");
-
-
-                } else if (store.getRemainStat().equals("break")) {
-                    ((TextView) mCalloutBalloon.findViewById(R.id.remain_state)).setText("정보 없음");
-                }
-            } else {
-                //((TextView) mCalloutBalloon.findViewById(R.id.).setText(store.getRemainStat());
-            }*/
-
 
 
             return mCalloutBalloon;
@@ -492,6 +525,8 @@ public class MapFrag extends Fragment implements MapView.CurrentLocationEventLis
             return null;
         }
     }
+
+
 }
 
 
