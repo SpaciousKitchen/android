@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        >
+
+        <LinearLayout
+
+            android:layout_marginTop="5dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_destination"
+                    android:layout_marginTop="3dp"
+                    android:textColorHint="#ffffffff"
+                    android:layout_marginLeft="5dp"
+                    android:hint="도착"
+                    android:gravity="center"
+                    android:background="@drawable/eidittext"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp" />
+
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginLeft="10dp"
+
+                android:layout_gravity="center"
+                android:id="@+id/search_btn"
+                app:cornerRadius="10dp"
+                android:layout_width="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_height="wrap_content"
+                android:text="길찾기"
+                />
+
+
+        </LinearLayout>
+
+
+
+        <RelativeLayout
+            android:id="@+id/searchmap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:gravity="center"
+                android:padding="5dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/bycar"
+                    android:layout_weight="1"
+
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:src="@drawable/car"
+
+                    app:backgroundTint="#ffffffff"
+                    app:fabCustomSize="50dp"  />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/baybus"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="30dp"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:src="@drawable/car"
+
+                    app:backgroundTint="#ffffffff"
+                    app:fabCustomSize="50dp"  />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/byfoot"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/car"
+                    android:layout_marginLeft="30dp"
+
+                    app:backgroundTint="#ffffffff"
+                    app:fabCustomSize="50dp" />
+
+
+            </LinearLayout>
+
+
+
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

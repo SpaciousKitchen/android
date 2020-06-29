@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:elevation="8dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffffff"
+
+    android:id="@+id/rl_bottom_sheet"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="200dp"
+
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/storename"
+        android:padding="10dp"
+        android:elevation="3dp"
+        android:layout_marginLeft="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@drawable/round"
+        android:textColor="#ffffff"
+        android:text="bottom_sheet_behavior"
+        android:textSize="15dp"
+        >
+
+    </TextView>
+    <TextView
+        android:id="@+id/jago"
+        android:layout_below="@+id/storename"
+
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="10dp"
+        android:textColor="#000000"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="마스크 재고 "
+        android:textSize="15dp"
+       />
+
+    <TextView
+        android:id="@+id/stock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/storename"
+
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/jago"
+
+
+        android:gravity="center"
+        android:text="100개 이상"
+        android:textSize="15dp"
+        android:textStyle="bold">
+
+    </TextView>
+
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/stock"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="서울특별시 강남구 논현로95길 29-13 2층 (역삼동)"
+        android:textColor="#A9A9A9"
+        android:textSize="10dp"
+        android:textStyle="bold">
+
+    </TextView>
+
+
+    <com.google.android.material.button.MaterialButton
+
+        android:id="@+id/gonavi"
+
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="15dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:gravity="center"
+
+
+        android:text="길찾기"
+        app:cornerRadius="5dp"
+
+        app:icon="@drawable/icon"
+        app:iconPadding="10dp" />
+
+    <View
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:layout_below="@+id/address"
+        android:background="#C5BDBD" />
+
+</RelativeLayout>

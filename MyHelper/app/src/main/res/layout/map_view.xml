@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:layout_marginLeft="10dp"
+                android:id="@+id/edit_location"
+                android:hint="위치를 입력하세요"
+                android:layout_weight="2"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/search"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="#FFFFFF"
+                android:gravity="center"
+                android:text="검색"
+                app:cornerRadius="15dp"
+                android:layout_weight="1"
+
+                app:iconPadding="10dp" />
+
+        </LinearLayout>
+
+
+
+
+        <RelativeLayout
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingRenew"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/gps"
+
+                app:backgroundTint="@color/colorAccent"
+                app:fabCustomSize="40dp" />
+        </RelativeLayout>
+
+
+
+
+
+
+
+    </LinearLayout>
+
+    <include
+
+        layout="@layout/bottom_sheet"
+
+        />
+
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
