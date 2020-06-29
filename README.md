@@ -3,7 +3,7 @@
 CamerTextureView
 -카메라 글자 인식 기능 :surfaceView 를 사용
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/xvuabyeVMiw)
+[![Watch the video](https://youtu.be/xvuabyeVMiw/0.jpg)](https://youtu.be/xvuabyeVMiw)
 
 
 MyHelper
