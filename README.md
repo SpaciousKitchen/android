@@ -9,14 +9,14 @@ CamerTextureView
 MyHelper
 -마스크 재고 확인 기능
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/Qwh-9c3KmgE)
+[![Watch the video](https://youtu.be/Qwh-9c3KmgE/0.jpg)](https://youtu.be/Qwh-9c3KmgE)
 
 
 
 chatApp
 -실시간 채팅 기능
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/iYW6IPzkTb0)
+[![Watch the video](https://youtu.be/iYW6IPzkTb0/0.jpg)](https://youtu.be/iYW6IPzkTb0)
 
 
 movieApp
@@ -27,5 +27,5 @@ movieApp
 newchatbot
 -챗봇 연습
 
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/I32GTySzcO4)
+[![Watch the video](https://youtu.be/I32GTySzcO4/0.jpg)](https://youtu.be/I32GTySzcO4)
 
