@@ -3,6 +3,8 @@
 ### 💡 서비스 소개
 
  ##### 공적 마스크 재고 확인 어플리케이션 
+ 
+ [![어플리케이션 시연 영상](https://img.youtube.com/vi/Qwh-9c3KmgE/1.jpg)](https://www.youtube.com/watch?v=Qwh-9c3KmgE) 
 
 ### 🛠 기술스택
  |   분류  |  스택 |
